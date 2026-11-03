@@ -52,6 +52,7 @@ APPNAME=mtb-example-fx20-smif-xip
 #
 # GCC_ARM -- GCC is available as part of ModusToolbox Setup program
 # ARM     -- ARM Clang Compiler (must be installed separately)
+# IAR     -- IAR Embedded Development Tools (must be installed separately)
 #
 # To use the ARM toolchain, ensure the CY_COMPILER_ARM_DIR environment variable is set to the compiler's directory (absolute path).
 # For example, the default path for ARMCLANG from a Keil installation is typically C:/Keil_v5/ARM/ARMCLANG.
@@ -135,13 +136,15 @@ endif
 
 # Select softfp or hardfp floating point. Default is softfp.
 ifeq ($(CORE), CM4)
-	ifeq ($(TOOLCHAIN), GCC_ARM)
-	    VFP_SELECT= softfp
-	else ifeq ($(TOOLCHAIN), ARM)
-	    VFP_SELECT= soft
-	endif
+    ifeq ($(TOOLCHAIN), GCC_ARM)
+        VFP_SELECT= softfp
+    else ifeq ($(TOOLCHAIN), ARM)
+        VFP_SELECT= soft
+    else ifeq ($(TOOLCHAIN), IAR)
+        VFP_SELECT= softfp
+    endif
 else ifeq ($(CORE), CM0P)
-	VFP_SELECT=
+    VFP_SELECT=
 endif
 
 # Additional / custom C compiler flags.
@@ -149,19 +152,23 @@ endif
 # NOTE: Includes and defines should use the INCLUDES and DEFINES variable
 # above.
 ifeq ($(CORE), CM4)
-	ifeq ($(TOOLCHAIN), GCC_ARM)
-	    CFLAGS= -Os -Og -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -ffunction-sections -fdata-sections -g
-	else ifeq ($(TOOLCHAIN), ARM)
-	    CFLAGS= -Os -Og -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mthumb -ffunction-sections -fdata-sections -g \
-	            --target=arm-arm-none-eabi -fno-rtti -fno-exceptions -Wno-error -fshort-wchar -fshort-enums
-	endif
+    ifeq ($(TOOLCHAIN), GCC_ARM)
+        CFLAGS= -Os -Og -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -ffunction-sections -fdata-sections -g
+    else ifeq ($(TOOLCHAIN), ARM)
+        CFLAGS= -Os -Og -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mthumb -ffunction-sections -fdata-sections -g \
+                --target=arm-arm-none-eabi -fno-rtti -fno-exceptions -Wno-error -fshort-wchar -fshort-enums
+    else ifeq ($(TOOLCHAIN), IAR)
+        CFLAGS= --diag_suppress Pe111
+    endif
 else ifeq ($(CORE), CM0P)
-	ifeq ($(TOOLCHAIN), GCC_ARM)
-	    CFLAGS= -Os -Og -mcpu=cortex-m0plus -mthumb -ffunction-sections -fdata-sections -g
-	else ifeq ($(TOOLCHAIN), ARM)
-	    CFLAGS= -Os -Og -mcpu=Cortex-M0plus -mthumb -ffunction-sections -fdata-sections -g \
-	            --target=arm-arm-none-eabi -fno-rtti -fno-exceptions -Wno-error -fshort-wchar -fshort-enums
-	endif
+    ifeq ($(TOOLCHAIN), GCC_ARM)
+        CFLAGS= -Os -Og -mcpu=cortex-m0plus -mthumb -ffunction-sections -fdata-sections -g
+    else ifeq ($(TOOLCHAIN), ARM)
+        CFLAGS= -Os -Og -mcpu=Cortex-M0plus -mthumb -ffunction-sections -fdata-sections -g \
+                --target=arm-arm-none-eabi -fno-rtti -fno-exceptions -Wno-error -fshort-wchar -fshort-enums
+    else ifeq ($(TOOLCHAIN), IAR)
+        CFLAGS= --diag_suppress Pe111
+    endif
 endif
 
 # Additional / custom C++ compiler flags.
@@ -178,17 +185,21 @@ ASFLAGS=
 
 # Additional / custom linker flags.
 ifeq ($(CORE), CM4)
-	ifeq ($(TOOLCHAIN), GCC_ARM)
-	    LDFLAGS=-Wl,--start-group -mcpu=cortex-m4 -mthumb --entry=Reset_Handler -Wl,--gc-sections -g -ffunction-sections -finline-functions -Os -Wl,--end-group
-	else ifeq ($(TOOLCHAIN), ARM)
-	    LDFLAGS=--cpu=Cortex-M4 --entry=Reset_Handler --diag_suppress=L6329W,L6314W
-	endif
+    ifeq ($(TOOLCHAIN), GCC_ARM)
+        LDFLAGS=-Wl,--start-group -mcpu=cortex-m4 -mthumb --entry=Reset_Handler -Wl,--gc-sections -g -ffunction-sections -finline-functions -Os -Wl,--end-group
+    else ifeq ($(TOOLCHAIN), ARM)
+        LDFLAGS=--cpu=Cortex-M4 --entry=Reset_Handler --diag_suppress=L6329W,L6314W
+    else ifeq ($(TOOLCHAIN), IAR)
+        LDFLAGS=--cpu Cortex-M4 --fpu FPv4-SP --manual_dynamic_initialization --entry Reset_Handler
+    endif
 else ifeq ($(CORE), CM0P)
-	ifeq ($(TOOLCHAIN), GCC_ARM)
-	    LDFLAGS=-Wl,--start-group -mcpu=cortex-m0plus -mthumb --entry=Reset_Handler -Wl,--gc-sections -g -ffunction-sections -finline-functions -Os -Wl,--end-group
-	else ifeq ($(TOOLCHAIN), ARM)
-	    LDFLAGS=--cpu=Cortex-M0plus --entry=Reset_Handler --diag_suppress=L6329W,L6314W
-	endif
+    ifeq ($(TOOLCHAIN), GCC_ARM)
+        LDFLAGS=-Wl,--start-group -mcpu=cortex-m0plus -mthumb --entry=Reset_Handler -Wl,--gc-sections -g -ffunction-sections -finline-functions -Os -Wl,--end-group
+    else ifeq ($(TOOLCHAIN), ARM)
+        LDFLAGS=--cpu=Cortex-M0plus --entry=Reset_Handler --diag_suppress=L6329W,L6314W
+    else ifeq ($(TOOLCHAIN), IAR)
+        LDFLAGS=--cpu Cortex-M0+ --manual_dynamic_initialization --entry Reset_Handler
+    endif
 endif
 
 # Additional / custom libraries to link in to the application.
@@ -208,18 +219,42 @@ endif
 ifeq ($(CORE), CM4)
     ifeq ($(BLENABLE), yes)
         # Use loadable linker script for CM4 core
-        LINKER_SCRIPT = $(if $(filter GCC_ARM,$(TOOLCHAIN)),$(LDPATH)/fx_cm4_loadable.ld,$(LDPATH)/fx_cm4_loadable.sct)
+        ifeq ($(TOOLCHAIN), GCC_ARM)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm4_loadable.ld
+        else ifeq ($(TOOLCHAIN), ARM)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm4_loadable.sct
+        else ifeq ($(TOOLCHAIN), IAR)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm4_loadable.icf
+        endif
     else
         # Use dual linker script for CM4 core
-        LINKER_SCRIPT = $(if $(filter GCC_ARM,$(TOOLCHAIN)),$(LDPATH)/fx_cm4.ld,$(LDPATH)/fx_cm4_dual.sct)
+        ifeq ($(TOOLCHAIN), GCC_ARM)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm4.ld
+        else ifeq ($(TOOLCHAIN), ARM)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm4_dual.sct
+        else ifeq ($(TOOLCHAIN), IAR)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm4_dual.icf
+        endif
     endif
-else ifeq ($(CORE),CM0P)
+else ifeq ($(CORE), CM0P)
     ifeq ($(BLENABLE), yes)
         # Use loadable linker script for CM0P core
-        LINKER_SCRIPT = $(if $(filter GCC_ARM,$(TOOLCHAIN)),$(LDPATH)/fx_cm0plus_loadable.ld,$(LDPATH)/fx_cm0plus_loadable.sct)
+        ifeq ($(TOOLCHAIN), GCC_ARM)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm0plus_loadable.ld
+        else ifeq ($(TOOLCHAIN), ARM)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm0plus_loadable.sct
+        else ifeq ($(TOOLCHAIN), IAR)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm0plus_loadable.icf
+        endif
     else
         # Use linker script for CM0P core
-        LINKER_SCRIPT = $(if $(filter GCC_ARM,$(TOOLCHAIN)),$(LDPATH)/fx_cm0plus.ld,$(LDPATH)/fx_cm0plus.sct)
+        ifeq ($(TOOLCHAIN), GCC_ARM)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm0plus.ld
+        else ifeq ($(TOOLCHAIN), ARM)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm0plus.sct
+        else ifeq ($(TOOLCHAIN), IAR)
+            LINKER_SCRIPT = $(LDPATH)/fx_cm0plus.icf
+        endif
     endif
 endif
 
@@ -234,16 +269,20 @@ ifeq ($(BLENABLE), yes)
 	$(CY_MCUELFTOOL) --sign build/$(TARGET)/$(CONFIG)/$(APPNAME).elf SHA256 --output build/$(TARGET)/$(CONFIG)/$(APPNAME).sha.elf && \
 	$(OBJCOPY) -O ihex --gap-fill 0 -R cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).sha.elf build/$(TARGET)/$(CONFIG)/$(APPNAME).hex
 else
-	ifeq ($(TOOLCHAIN), GCC_ARM)
-	    POSTBUILD=\
-	        $(OBJCOPY) -O ihex -R cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).elf build/$(TARGET)/$(CONFIG)/$(APPNAME).hex && \
-	        $(OBJCOPY) -O binary --only-section=cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).elf build/$(TARGET)/$(CONFIG)/$(APPNAME)_qspi.bin
-	else ifeq ($(TOOLCHAIN), ARM)
-	    POSTBUILD=\
-	        $(FROMELF) --i32combined --base="\#0=0x10000000,\#1=0x18000000" -o build/$(TARGET)/$(CONFIG)/$(APPNAME)-temp.hex build/$(TARGET)/$(CONFIG)/$(APPNAME).elf && \
-	        $(CY_SREC_CAT) build/$(TARGET)/$(CONFIG)/$(APPNAME)-temp.hex -Intel -crop 0x10000000 0x10080000 -o build/$(TARGET)/$(CONFIG)/$(APPNAME).hex -Intel -Output_Block_Size=16 && \
-	        $(OBJCOPY) -O binary --only-section=cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).elf build/$(TARGET)/$(CONFIG)/$(APPNAME)_qspi.bin
-	endif
+    ifeq ($(TOOLCHAIN), GCC_ARM)
+        POSTBUILD=\
+            $(OBJCOPY) -O ihex -R cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).elf build/$(TARGET)/$(CONFIG)/$(APPNAME).hex && \
+            $(OBJCOPY) -O binary --only-section=cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).elf build/$(TARGET)/$(CONFIG)/$(APPNAME)_qspi.bin
+    else ifeq ($(TOOLCHAIN), IAR)
+        POSTBUILD=\
+            $(OBJCOPY) -O ihex -R cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).elf build/$(TARGET)/$(CONFIG)/$(APPNAME).hex && \
+            $(OBJCOPY) -O binary --only-section=cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).elf build/$(TARGET)/$(CONFIG)/$(APPNAME)_qspi.bin
+    else ifeq ($(TOOLCHAIN), ARM)
+        POSTBUILD=\
+            $(FROMELF) --i32combined --base="\#0=0x10000000,\#1=0x18000000" -o build/$(TARGET)/$(CONFIG)/$(APPNAME)-temp.hex build/$(TARGET)/$(CONFIG)/$(APPNAME).elf && \
+            $(CY_SREC_CAT) build/$(TARGET)/$(CONFIG)/$(APPNAME)-temp.hex -Intel -crop 0x10000000 0x10080000 -o build/$(TARGET)/$(CONFIG)/$(APPNAME).hex -Intel -Output_Block_Size=16 && \
+            $(OBJCOPY) -O binary --only-section=cy_xip build/$(TARGET)/$(CONFIG)/$(APPNAME).elf build/$(TARGET)/$(CONFIG)/$(APPNAME)_qspi.bin
+    endif
 endif
 
 ################################################################################

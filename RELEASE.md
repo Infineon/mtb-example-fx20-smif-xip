@@ -1,12 +1,16 @@
-# EZ-USB&trade; FX20: SMIF eXecute-In-Place application 1.0.0
+# EZ-USB&trade; FX20: SMIF eXecute-In-Place application 1.0.1
 
 ## What's Included?
 
 Refer to the [README.md](./README.md).
 
+## Feature Changes
+
+* Added IAR compiler support
+
 ## Defect Fixes
 
-* Initial release
+* None
 
 ## Supported Software and Tools
 
@@ -15,10 +19,10 @@ This version of the application is compatible with the following software and to
 | Software and Tools                                       | Version |
 | :---                                                     | :----:  |
 | ModusToolbox&trade; software environment                 | 3.6.0   |
-| CAT1A Peripheral Driver Library                          | 3.18.0  |
-| USBFXStack Middleware Library                            | 1.3.1   |
+| CAT1A Peripheral Driver Library                          | 3.20.0  |
+| USBFXStack Middleware Library                            | 1.3.3   |
 | FreeRTOS&trade; for Infineon MCUs                        | 10.5.004|
-| GNU Arm&reg; Embedded Compiler                           | 11.3.1  |
+| GNU Arm&reg; Embedded Compiler                           | 14.2.1  |
 | Arm&reg; Compiler                                        | 6.22    |
 
 ## More information

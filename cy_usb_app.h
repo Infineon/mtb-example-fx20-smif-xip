@@ -59,8 +59,13 @@ extern "C" {
 #define HBDMA_BUF_ATTRIBUTES                                                   \
 	__attribute__((section(".hbBufSection"), used)) __attribute__((aligned(32)))
 
-#define XIP_ATTRIBUTE \
+#ifdef __IAR_SYSTEMS_ICC__
+#define XIP_ATTRIBUTE                                                           \
+    __attribute__ ((section(".cy_xip"), used))
+#else
+#define XIP_ATTRIBUTE                                                           \
     __attribute__ ((section(".cy_xip"), used)) __attribute__ ((aligned (8)))
+#endif /* __IAR_SYSTEMS_ICC__ */
 
 
 /* Get the LS byte from a 16-bit number */

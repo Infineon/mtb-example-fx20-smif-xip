@@ -10,7 +10,7 @@ The `Cy_HandleBootSwitchEvent()` function is executed from the external SPI flas
 
 [View this README on GitHub.](https://github.com/Infineon/mtb-example-fx20-smif-xip)
 
-[Provide feedback on this code example.](https://yourvoice.infineon.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyNDIwOTgiLCJTcGVjIE51bWJlciI6IjAwMi00MjA5OCIsIkRvYyBUaXRsZSI6IkVaLVVTQiZ0cmFkZTsgRlgyMDogU01JRiBFeGVjdXRlLWluLVBsYWNlIGFwcGxpY2F0aW9uIiwicmlkIjoia2FydGhpay5zaXZhcmFtYWtyaXNobmFuQGluZmluZW9uLmNvbSIsIkRvYyB2ZXJzaW9uIjoiMS4wLjAiLCJEb2MgTGFuZ3VhZ2UiOiJFbmdsaXNoIiwiRG9jIERpdmlzaW9uIjoiTUNEIiwiRG9jIEJVIjoiV0lSRUQiLCJEb2MgRmFtaWx5IjoiU1NfVVNCIn0=)
+[Provide feedback on this code example.](https://yourvoice.infineon.com/jfe/form/SV_1NTns53sK2yiljn?Q_EED=eyJVbmlxdWUgRG9jIElkIjoiQ0UyNDIwOTgiLCJTcGVjIE51bWJlciI6IjAwMi00MjA5OCIsIkRvYyBUaXRsZSI6IkVaLVVTQiZ0cmFkZTsgRlgyMDogU01JRiBFeGVjdXRlLWluLVBsYWNlIGFwcGxpY2F0aW9uIiwicmlkIjoia2FydGhpay5zaXZhcmFtYWtyaXNobmFuQGluZmluZW9uLmNvbSIsIkRvYyB2ZXJzaW9uIjoiMS4wLjEiLCJEb2MgTGFuZ3VhZ2UiOiJFbmdsaXNoIiwiRG9jIERpdmlzaW9uIjoiTUNEIiwiRG9jIEJVIjoiV0lSRUQiLCJEb2MgRmFtaWx5IjoiU1NfVVNCIn0=)
 
 
 ## Requirements
@@ -262,7 +262,7 @@ This application's functionality can be customized by setting variables in *Make
 
 - Run the `make build CORE=CM0P` command or set the variable in *Makefile* to compile and generate the binary for the Cortex&reg; M0+ core. By default, `CORE` is set as `CM4` and the binary is compiled and generated for the Cortex&reg; M4 core
 
-- Choose between the **Arm&reg; Compiler** or the **GNU Arm&reg; Embedded Compiler** build toolchains by setting the `TOOLCHAIN` variable in *Makefile* to `ARM` or `GCC_ARM` respectively. If you set it to `ARM`, ensure to set `CY_ARM_COMPILER_DIR` as a make variable or environment variable, pointing to the path of the compiler's root directory
+- Choose between the **Arm&reg; Compiler** or the **GNU Arm&reg; Embedded Compiler** build toolchains by setting the `TOOLCHAIN` variable in *Makefile* to `ARM` or `GCC_ARM` respectively. If you set it to `ARM`, ensure to set `CY_COMPILER_ARM_DIR` as a make variable or environment variable, pointing to the path of the compiler's root directory
 
 Additional settings can be configured through macros specified by the `DEFINES` variable in *Makefile*:
 
@@ -301,6 +301,7 @@ Document title: *CE242098* – *EZ-USB&trade; FX20: SMIF Execute-in-Place applic
  Version | Description of change
  ------- | ---------------------
  1.0.0   | New code example
+ 1.0.1   | Added IAR compiler support
 
 <br>
 

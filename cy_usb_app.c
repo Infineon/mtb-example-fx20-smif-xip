@@ -45,6 +45,8 @@
 #include "cy_usb_qspi.h"
 
 HBDMA_BUF_ATTRIBUTES uint32_t SetSelDataBuffer[8];
+HBDMA_BUF_ATTRIBUTES uint8_t  Ep0XferBuffer[32];
+
 /*
  * Function: Cy_USB_VbusDebounceTimerCallback()
  * Description: Timer used to do debounce on VBus changed interrupt
@@ -523,22 +525,16 @@ void Cy_USB_AppSetupCallback(void *pAppCtxt, cy_stc_usb_usbd_ctxt_t *pUsbdCtxt,
     cy_en_usb_endp_dir_t epDir = CY_USB_ENDP_DIR_INVALID;
 
     DBG_APP_INFO("USB Setup Callback\r\n");
-    uint8_t endpNumber;
-    uint8_t emptyBuffer[8] = {0};
-
-    /* Fast enumeration is used. Only requests addressed to the interface,
-     * class, vendor and unknown control requests are received by this function.
-     */
+    uint8_t endpNumber, i;
 
     /* Decode the fields from the setup request. */
     bReqType = pUsbdCtxt->setupReq.bmRequest;
-    bType =
-        ((bReqType & CY_USB_CTRL_REQ_TYPE_MASK) >> CY_USB_CTRL_REQ_TYPE_POS);
-    bTarget = (bReqType & CY_USB_CTRL_REQ_RECIPENT_OTHERS);
+    bType    = ((bReqType & CY_USB_CTRL_REQ_TYPE_MASK) >> CY_USB_CTRL_REQ_TYPE_POS);
+    bTarget  = (bReqType & CY_USB_CTRL_REQ_RECIPENT_OTHERS);
     bRequest = pUsbdCtxt->setupReq.bRequest;
-    wValue = pUsbdCtxt->setupReq.wValue;
-    wIndex = pUsbdCtxt->setupReq.wIndex;
-    wLength = pUsbdCtxt->setupReq.wLength;
+    wValue   = pUsbdCtxt->setupReq.wValue;
+    wIndex   = pUsbdCtxt->setupReq.wIndex;
+    wLength  = pUsbdCtxt->setupReq.wLength;
 
     if (bType == CY_USB_CTRL_REQ_STD) {
         DBG_APP_INFO("Standard Request\r\n");
@@ -612,8 +608,11 @@ void Cy_USB_AppSetupCallback(void *pAppCtxt, cy_stc_usb_usbd_ctxt_t *pUsbdCtxt,
                The other EPs were receiving a EP halt without this addition */
         {
             DBG_APP_INFO("BL Check\r\n");
-            retStatus = Cy_USB_USBD_SendEndp0Data(
-                    pUsbdCtxt, (uint8_t *)emptyBuffer, wLength);
+            for (i = 0; i < 8; i++) {
+                Ep0XferBuffer[i] = 0;
+            }
+
+            retStatus = Cy_USB_USBD_SendEndp0Data(pUsbdCtxt, Ep0XferBuffer, wLength);
             if (retStatus == CY_USBD_STATUS_SUCCESS) {
                 isReqHandled = true;
             }
